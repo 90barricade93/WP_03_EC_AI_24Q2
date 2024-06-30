@@ -26,7 +26,7 @@ const themes = [
   'Romanticism',
   'Still Life',
   'Surrealism',
-].sort();
+];
 
 export default function ThemeSelectionPage() {
   const [selectedTheme, setSelectedTheme] = useState<string | null>(null);
