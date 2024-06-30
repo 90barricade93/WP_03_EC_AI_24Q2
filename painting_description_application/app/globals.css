@@ -24,6 +24,17 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+    margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+.main {
+  min-height: 100vh;
+
+}
+.ChoiceImage { 
+  width: '640px';
+  height: '640px';
+  margin: '20px 0';
 }
 
 @layer utilities {
@@ -31,3 +42,5 @@ body {
     text-wrap: balance;
   }
 }
+
+
