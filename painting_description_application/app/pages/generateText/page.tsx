@@ -9,9 +9,9 @@ export default function GenerateTextPage() {
   const theme = searchParams.get('theme');
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center' }}>
-      <h1>Generate Text Page</h1>
-      <p>This is where the text will be generated about {theme}</p>
-    </div>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <h1>Generate Text Page </h1>
+        <p>This is where the text will be generated about {theme}</p>
+      </div>
   );
 }

@@ -48,7 +48,7 @@ export default function ThemeSelectionPage() {
     if (selectedTheme) {
       setLoading(true);
       setTimeout(() => {
-        router.push(`/generateText?theme=${selectedTheme}`);
+        router.push(`/pages/generateText?theme=${selectedTheme}`);
       }, 1000);
     }
   };
