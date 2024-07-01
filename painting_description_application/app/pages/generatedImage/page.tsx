@@ -1,6 +1,6 @@
 "use client";
 
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
@@ -12,6 +12,7 @@ export default function GeneratedImagePage() {
   const var3 = searchParams.get('var3');
   const var4 = searchParams.get('var4');
   const var5 = searchParams.get('var5');
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [imageUrl, setImageUrl] = useState('');
   const [showLoadingPopup, setShowLoadingPopup] = useState(true);
@@ -49,6 +50,10 @@ export default function GeneratedImagePage() {
     URL.revokeObjectURL(url);
   };
 
+  const handleRestart = () => {
+    router.push('/');
+  };
+
   return (
     <div className="flex flex-col justify-between min-h-screen text-center font-sans bg-black-50 text-gray-800">
       {/* Banner */}
@@ -73,12 +78,20 @@ export default function GeneratedImagePage() {
                 className="mt-4"
               />
             )}
-            <button
-              onClick={handleDownload}
-              className="mt-4 py-2 px-4 bg-blue-600 text-white rounded-full"
-            >
-              Download Image
-            </button>
+            <div className="flex space-x-4">
+              <button
+                onClick={handleDownload}
+                className="mt-4 py-2 px-4 bg-blue-600 text-white rounded-full"
+              >
+                Download Image
+              </button>
+              <button
+                onClick={handleRestart}
+                className="mt-4 py-2 px-4 bg-red-600 text-white rounded-full"
+              >
+                Restart
+              </button>
+            </div>
           </div>
         )}
       </main>
