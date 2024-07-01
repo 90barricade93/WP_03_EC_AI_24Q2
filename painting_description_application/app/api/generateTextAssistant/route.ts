@@ -14,7 +14,7 @@ export async function POST(request: Request) {
       messages: [
         {
           role: 'user',
-          content: `Generate a painting description for the theme: ${theme}`,
+          content: `Generate a painting description for the theme: ${theme}in 285 words`,
         },
       ],
     });

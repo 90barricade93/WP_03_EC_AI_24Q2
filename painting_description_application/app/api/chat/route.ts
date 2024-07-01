@@ -16,11 +16,11 @@ export async function POST(req: Request) {
       {
         role: 'system',
         content:
-          'You are a professional writer who writes a prompt describing a image. The image could have one of themes: work, holiday, hobby, food and sports. \
-          Imagine a random picture with the chosen theme and write a prompt depicting the image perfectly. The prompt should be one concise but comprehensive sentence .'
+          'You are an AI assistant that generates detailed descriptions about painting themes and the AI has been trained to describe a painting based on a short description (theme) from USER, You will provide efficient strictly painting descriptions with details about its elements, style, details, and colors. The AI thinks outside the box and is creative.'
       },
       ...messages,
     ],
+    
   });
 
   const stream = OpenAIStream(response);

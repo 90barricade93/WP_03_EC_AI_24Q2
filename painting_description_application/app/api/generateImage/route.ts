@@ -1,44 +1,36 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
-// Initialiseer de OpenAI-client
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY
 });
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { theme } = req.body;
-
+export async function POST(request: Request) {
   try {
-    // Maak een nieuwe thread
-    const thread = await openai.beta.threads.create();
+    const { text, n_images, size } = await request.json();
 
-    // Voeg een bericht toe aan de thread
-    await openai.beta.threads.messages.create(thread.id, {
-      role: "user",
-      content: `Generate a detailed description about ${theme}`,
+    const response = await openai.images.generate({
+      prompt: text,
+      n: n_images,
+      size: size,
     });
 
-    // Start een run met de assistent
-    const run = await openai.beta.threads.runs.create(thread.id, {
-      assistant_id: process.env.OPENAI_ASSISTANT_ID,
-    });
+    if (!response || !response.data) {
+      throw new Error('Invalid response from OpenAI');
+    }
 
-    // Stream het antwoord van de assistent
-    let generatedText = '';
-    run.on('textDelta', (textDelta) => {
-      generatedText += textDelta.value;
-    });
+    const images = response.data.map((img: { url: string }) => img.url);
 
-    run.on('end', () => {
-      res.status(200).json({ text: generatedText });
-    });
-
-    run.on('error', (error) => {
-      res.status(500).json({ error: error.message });
-    });
-
+    return NextResponse.json({ images });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error generating images:', error);
+
+    if (error.response) {
+      const { status, data } = error.response;
+      console.error('Error response from OpenAI:', status, data);
+      return new NextResponse(JSON.stringify({ error: data }), { status });
+    }
+
+    return new NextResponse(JSON.stringify({ error: error.message }), { status: 500 });
   }
 }

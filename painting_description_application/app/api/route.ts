@@ -7,16 +7,18 @@ const openai = new OpenAI({
 
 export async function POST(request: Request) {
   try {
-    const { name, instructions, model } = await request.json();
+    const assistantId = 'asst_N3hFnk0NfsTUwSzG8d9Zv2LI';
 
     const assistant = await openai.beta.assistants.create({
-      name,
-      description: null,
-      model,
-      instructions,
+      name: "Data visualizer",
+      model: "gpt-4-turbo",
       tools: [],
-      top_p: 1,
-      temperature: 1,
+      assistant_id: assistantId, // Correct field for the assistant ID
+      tool_resources: {
+        "code_interpreter": {
+          "file_ids": ["your_file_id_here"] // Replace this with your actual file ID
+        }
+      }
     });
 
     return NextResponse.json(assistant);

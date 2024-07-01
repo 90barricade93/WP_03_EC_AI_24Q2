@@ -1,7 +1,7 @@
 "use client";
 
 import { useChat } from "ai/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
@@ -10,6 +10,8 @@ export default function ThemeSelectionPage() {
   const [selectedTheme, setSelectedTheme] = useState<string | null>(null);
   const [imageSrc, setImageSrc] = useState('/Default.png'); // Default image
   const [generatedText, setGeneratedText] = useState<string | null>(null);
+  const [isGenerated, setIsGenerated] = useState(false);
+  const [showGenerationComplete, setShowGenerationComplete] = useState(false);
   const router = useRouter();
 
   const themes = [
@@ -35,7 +37,7 @@ export default function ThemeSelectionPage() {
     'Surrealism',
   ];
 
-  const handleThemeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleThemeChange = useCallback((event: React.ChangeEvent<HTMLSelectElement>) => {
     const theme = event.target.value;
     setSelectedTheme(theme);
     if (theme) {
@@ -43,27 +45,41 @@ export default function ThemeSelectionPage() {
     } else {
       setImageSrc('/Default.png'); // Revert to default if no theme is selected
     }
-  };
+  }, []);
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     if (selectedTheme) {
       // AI prompt generation
+      setIsGenerated(false); // Reset generation status
       append({
         role: "user",
         content: `Generate a prompt describing a picture related to ${selectedTheme}.`,
       });
     }
-  };
+  }, [selectedTheme, append]);
 
   useEffect(() => {
     if (messages.length > 0 && !messages[messages.length - 1].content.startsWith("Generate")) {
-      setGeneratedText(messages[messages.length - 1].content);
+      const text = messages[messages.length - 1].content;
+      setGeneratedText(text);
+      setIsGenerated(true); // Set to true when text is generated
+      console.log("Generated Text:", text); // Log the generated text to the console
+
+      // Show generation complete indicator after loading disappears
+      setShowGenerationComplete(true);
+      setTimeout(() => setShowGenerationComplete(false), 3000);
     }
   }, [messages]);
 
   useEffect(() => {
     if (generatedText) {
-      router.push(`pages/generateText?theme=${selectedTheme}&text=${encodeURIComponent(generatedText)}`);
+      // Store the text in session storage
+      sessionStorage.setItem('generatedText', generatedText);
+      sessionStorage.setItem('selectedTheme', selectedTheme || '');
+      // Push to the new page after a delay
+      setTimeout(() => {
+        router.push('/pages/generateText');
+      }, 4000); // 4 second delay
     }
   }, [generatedText, selectedTheme, router]);
 
@@ -71,14 +87,14 @@ export default function ThemeSelectionPage() {
     <div className="flex flex-col justify-between min-h-screen text-center font-sans">
       <header className="bg-gray-800 text-white p-5">
         <div className="flex justify-center">
-          <Image src="/Banner-1200x200.png" width={1200} height={200} alt="Logo" className="h-24" />
+          <Image src="/Banner-1200x200.jpg" width={1200} height={200} alt="Logo" className="h-24" />
         </div>
         <h1 className="mt-4">Select a Painting Theme</h1>
       </header>
 
-      <main className="flex flex-col items-center justify-center flex-1">
+      <main className="flex flex-col items-center justify-center flex-1 p-4">
         <Image src={imageSrc} width={640} height={480} alt="Selected Theme" className="w-full max-w-md h-96 object-contain my-8" />
-        <div className="mb-8">
+        <div className="mb-8 w-full">
           <label htmlFor="theme-select" className="text-white text-lg mr-4">Choose a theme:</label>
           <select id="theme-select" value={selectedTheme || ''} onChange={handleThemeChange} className="text-black p-2 rounded-md">
             <option value="">Theme</option>
@@ -89,11 +105,19 @@ export default function ThemeSelectionPage() {
             ))}
           </select>
           <div>
-            <button onClick={handleSubmit} disabled={!selectedTheme || isLoading} className="mt-4 py-2 px-4 bg-gray-600 text-white rounded-full border border-white">
+            <button onClick={handleSubmit} disabled={!selectedTheme} className="mt-4 py-2 px-4 bg-gray-600 text-white rounded-full border border-white">
               {isLoading ? 'Loading...' : 'Submit'}
             </button>
           </div>
         </div>
+
+        {/* Generation complete indicator */}
+        {!isLoading && showGenerationComplete && (
+          <div className="flex items-center justify-center mt-4">
+            <span className="h-4 w-4 bg-green-500 rounded-full"></span>
+            <p className="text-white ml-2">Generation Complete</p>
+          </div>
+        )}
       </main>
 
       <footer className="bg-gray-800 text-white p-3">
