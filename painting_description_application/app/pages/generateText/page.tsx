@@ -2,30 +2,48 @@
 
 import { useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function GenerateTextPage() {
   const searchParams = useSearchParams();
   const theme = searchParams.get('theme');
-  const router = useRouter();
-  const [generatedText, setGeneratedText] = useState(`This is where the text will be generated about ${theme}`);
-  const [loading, setLoading] = useState(false);
+  const [nImages, setNImages] = useState(1);
+  const [size, setSize] = useState('256x256');
+  const [generatedText, setGeneratedText] = useState(`Generating text for theme: ${theme}`);
+  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [variable1, setVariable1] = useState(0.5);
-  const [variable2, setVariable2] = useState(0.5);
-  const [variable3, setVariable3] = useState(0.5);
-  const [variable4, setVariable4] = useState(0.5);
-  const [variable5, setVariable5] = useState(0.5);
+  const router = useRouter();
 
-  const regenerateText = () => {
-    setGeneratedText(`This is the newly generated text about ${theme}`);
-  };
+  useEffect(() => {
+    async function fetchGeneratedText() {
+      try {
+        const response = await fetch('/api/generateTextAssistant', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ theme, n_images: nImages, size }),
+        });
+
+        const data = await response.json();
+        if (data.text) {
+          setGeneratedText(data.text);
+        } else {
+          console.error(data.error);
+        }
+      } catch (error) {
+        console.error('Error generating text:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchGeneratedText();
+  }, [theme, nImages, size]);
 
   const handleSubmitForImaging = () => {
-    setLoading(true);
-    setTimeout(() => {
-      router.push(`generatedImage?text=${encodeURIComponent(generatedText)}&var1=${variable1}&var2=${variable2}&var3=${variable3}&var4=${variable4}&var5=${variable5}`);
-    }, 1000);
+    setShowModal(false);
+    router.push(`generatedImage?text=${encodeURIComponent(generatedText)}&n_images=${nImages}&size=${size}`);
   };
 
   return (
@@ -35,22 +53,16 @@ export default function GenerateTextPage() {
         <div className="flex justify-center">
           <Image src="/Banner-1200x200.jpg" width={1200} height={200} alt="Logo" className="h-24" />
         </div>
-        <h1 className="mt-4">Select a Painting Theme</h1>
+        <h1 className="mt-4">Generating Text for: {theme}</h1>
       </header>
 
       {/* Main Content */}
       <main className="flex flex-col items-center justify-center flex-1 p-5">
         <div className="bg-white p-10 shadow-md rounded-md mb-4">
-          <h2 className="text-2xl mb-4">Generate Text Page</h2>
-          <p className="text-lg">{generatedText}</p>
+          <h2 className="text-2xl mb-4">Generated Text</h2>
+          {loading ? <p>Loading...</p> : <p className="text-lg">{generatedText}</p>}
         </div>
         <div className="flex space-x-4">
-          <button 
-            onClick={regenerateText} 
-            className="py-2 px-4 bg-gray-600 text-white rounded-full border border-white"
-          >
-            Regenerate
-          </button>
           <button 
             onClick={() => setShowModal(true)} 
             className="py-2 px-4 bg-gray-600 text-white rounded-full border border-white"
@@ -71,64 +83,28 @@ export default function GenerateTextPage() {
           <div className="bg-white p-8 rounded-md shadow-md">
             <h2 className="text-xl mb-4">Set Variables for Image Generation</h2>
             <div className="mb-4">
-              <label className="block text-gray-700">Variable 1: {variable1}</label>
+              <label className="block text-gray-700">Number of Images: {nImages}</label>
               <input 
                 type="range" 
-                min="0" 
-                max="1" 
-                step="0.01" 
-                value={variable1} 
-                onChange={(e) => setVariable1(parseFloat(e.target.value))} 
+                min="1" 
+                max="4" 
+                step="1" 
+                value={nImages} 
+                onChange={(e) => setNImages(parseInt(e.target.value))} 
                 className="w-full"
               />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700">Variable 2: {variable2}</label>
-              <input 
-                type="range" 
-                min="0" 
-                max="1" 
-                step="0.01" 
-                value={variable2} 
-                onChange={(e) => setVariable2(parseFloat(e.target.value))} 
-                className="w-full"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700">Variable 3: {variable3}</label>
-              <input 
-                type="range" 
-                min="0" 
-                max="1" 
-                step="0.01" 
-                value={variable3} 
-                onChange={(e) => setVariable3(parseFloat(e.target.value))} 
-                className="w-full"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700">Variable 4: {variable4}</label>
-              <input 
-                type="range" 
-                min="0" 
-                max="1" 
-                step="0.01" 
-                value={variable4} 
-                onChange={(e) => setVariable4(parseFloat(e.target.value))} 
-                className="w-full"
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block text-gray-700">Variable 5: {variable5}</label>
-              <input 
-                type="range" 
-                min="0" 
-                max="1" 
-                step="0.01" 
-                value={variable5} 
-                onChange={(e) => setVariable5(parseFloat(e.target.value))} 
-                className="w-full"
-              />
+              <label className="block text-gray-700">Size: {size}</label>
+              <select 
+                value={size} 
+                onChange={(e) => setSize(e.target.value)} 
+                className="w-full p-2 border rounded-md"
+              >
+                <option value="256x256">256x256</option>
+                <option value="512x512">512x512</option>
+                <option value="1024x1024">1024x1024</option>
+              </select>
             </div>
             <div className="flex justify-end space-x-4">
               <button 
