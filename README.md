@@ -26,6 +26,10 @@ This project involves creating an application from scratch using Next.js and int
 - **Loader**: Displays a loader while the image is being generated.
 - **Form for Image Parameters**: Users can choose parameters for image generation.
 
+## Example video
+
+[![Video Demo](/ScreenRecording.mp4)](ScreenRecording.mp4)
+
 ## Project Members Group 9
 
 - [Emmanuel](https://github.com/codehouze)
