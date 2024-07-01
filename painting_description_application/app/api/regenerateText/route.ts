@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     const { theme } = await request.json();
 
     const response = await openai.chat.completions.create({
-      
+      max_tokens: 120,
       model: 'gpt-4o',
       messages: [
         {
