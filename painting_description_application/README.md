@@ -1,4 +1,7 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Example video
+
+[![Video Demo](/ScreenRecording.mp4)](ScreenRecording.mp4)
 
 ## Getting Started
 
