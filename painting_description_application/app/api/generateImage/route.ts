@@ -1,50 +1,36 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+import { NextResponse } from 'next/server';
+import OpenAI from 'openai';
 
-type Data = {
-  imageUrl?: string;
-  error?: string;
-};
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<Data>
-) {
-  const { text, var1, var2, var3, var4, var5 } = req.body;
-
+export async function POST(request: Request) {
   try {
-    const imageUrl = await generateImageWithOpenAI(text, var1, var2, var3, var4, var5);
-    res.status(200).json({ imageUrl });
+    const { text, n_images, size } = await request.json();
+
+    const response = await openai.images.generate({
+      prompt: text,
+      n: n_images,
+      size: size,
+    });
+
+    if (!response || !response.data) {
+      throw new Error('Invalid response from OpenAI');
+    }
+
+    const images = response.data.map((img: { url: string }) => img.url);
+
+    return NextResponse.json({ images });
   } catch (error) {
-    console.error('Error generating image with OpenAI:', error);
-    res.status(500).json({ error: 'Failed to generate image' });
+    console.error('Error generating images:', error);
+
+    if (error.response) {
+      const { status, data } = error.response;
+      console.error('Error response from OpenAI:', status, data);
+      return new NextResponse(JSON.stringify({ error: data }), { status });
+    }
+
+    return new NextResponse(JSON.stringify({ error: error.message }), { status: 500 });
   }
-}
-
-async function generateImageWithOpenAI(text: string, var1: string, var2: string, var3: string, var4: string, var5: string): Promise<string> {
-  // Voeg hier de code toe om de afbeelding te genereren met OpenAI
-  // Voorbeeld implementatie:
-  const response = await fetch('https://api.openai.com/v1/images/generate', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer YOUR_OPENAI_API_KEY`,
-    },
-    body: JSON.stringify({
-      prompt: `${text} ${var1} ${var2} ${var3} ${var4} ${var5}`,
-      n: 1,
-      size: '512x512',
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to generate image');
-  }
-
-  const data = await response.json();
-
-  if (!data.data || data.data.length === 0) {
-    throw new Error('No image generated');
-  }
-
-  return data.data[0].url; // Veronderstellend dat de API een URL van de gegenereerde afbeelding teruggeeft
 }
