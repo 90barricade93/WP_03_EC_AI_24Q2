@@ -28,7 +28,11 @@ This project involves creating an application from scratch using Next.js and int
 
 ## Example video
 
-[![Video Demo](/ScreenRecording.mp4)](ScreenRecording.mp4)
+<video width="400" controls>
+  <source src="/working.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
 
 ## Project Members Group 9
 
@@ -61,3 +65,6 @@ We would like to thank the [Encode Club AI BootCamp](https://github.com/Encode-C
 </div>
 
 ---
+
+
+[prototype.mp4]: /prototype.mp4

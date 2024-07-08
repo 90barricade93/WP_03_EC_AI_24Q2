@@ -155,7 +155,7 @@ export default function GenerateTextPage() {
       {loading && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
         <div className="bg-white p-8 rounded-md shadow-md w-3/4 h-3/4 flex items-center justify-center">
-          <p className="text-4xl">Loading...</p>
+          <p className="text-4xl animate-pulse">Loading...</p>
         </div>
       </div>
       )}

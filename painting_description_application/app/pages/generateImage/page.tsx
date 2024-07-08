@@ -19,18 +19,13 @@ export default function GenerateImagePage() {
     }
   }, [router]);
 
-  const downloadImage = async () => {
-    const response = await fetch('/api/generateImage');
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-
+  const downloadImage = (url: string, index: number) => {
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'generated_image.png';
+    link.download = `generated_image_${index + 1}.jpg`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
   };
 
   const handleImageClick = (img: string) => {
@@ -61,7 +56,7 @@ export default function GenerateImagePage() {
                   onClick={() => handleImageClick(img)}
                 />
                 <button 
-                  onClick={downloadImage} 
+                  onClick={() => downloadImage(img, index)} 
                   className="absolute top-2 right-2 bg-blue-600 text-white py-1 px-2 rounded-full"
                 >
                   Download
@@ -72,12 +67,20 @@ export default function GenerateImagePage() {
         ) : (
           <p>No images to display.</p>
         )}
-        <button 
-          onClick={() => router.push('/')} 
-          className="mt-8 py-2 px-4 bg-gray-600 text-white rounded-full border border-white"
-        >
-          Back to Home
-        </button>
+        <div className="flex space-x-4 mt-8">
+          <button 
+            onClick={() => router.back()} 
+            className="py-2 px-4 bg-gray-600 text-white rounded-full border border-white"
+          >
+            Back to Previous
+          </button>
+          <button 
+            onClick={() => router.push('/')} 
+            className="py-2 px-4 bg-gray-600 text-white rounded-full border border-white"
+          >
+            Back to Home
+          </button>
+        </div>
       </main>
 
       {/* Footer */}

@@ -106,18 +106,15 @@ export default function ThemeSelectionPage() {
           </select>
           <div>
             <button onClick={handleSubmit} disabled={!selectedTheme} className="mt-4 py-2 px-4 bg-gray-600 text-white rounded-full border border-white">
-              {isLoading ? 'Loading...' : 'Submit'}
+              {isLoading ? (
+                <span className="animate-pulse text-white">Loading...</span>
+              ) : (
+                'Submit'
+              )}
             </button>
           </div>
         </div>
 
-        {/* Generation complete indicator */}
-        {!isLoading && showGenerationComplete && (
-          <div className="flex items-center justify-center mt-4">
-            <span className="h-4 w-4 bg-green-500 rounded-full"></span>
-            <p className="text-white ml-2">Generation Complete</p>
-          </div>
-        )}
       </main>
 
       <footer className="bg-gray-800 text-white p-3">
